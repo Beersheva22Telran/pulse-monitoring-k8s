@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-data-provider
+spec:
+  selector:
+    matchLabels:
+      app: email-data-provider
+  template:
+    metadata:
+      labels:
+        app: email-data-provider
+    spec:
+      containers:
+        - name: email-data-provider
+          image: yuragranovsky/email-data-provider
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "250m"
+
+          env:
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: postgresqlPassword
+            - name: CONFIG_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-monitoring-config-map
+                  key: configServerHost
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-data-provider
+spec:
+  selector:
+    app: email-data-provider
+  ports:
+    - port: 8080
+      targetPort: 8080

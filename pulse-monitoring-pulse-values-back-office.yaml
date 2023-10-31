@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse-values-back-office
+spec:
+  selector:
+    matchLabels:
+      app: pulse-values-back-office
+  template:
+    metadata:
+      labels:
+        app: pulse-values-back-office
+    spec:
+      containers:
+        - name: pulse-values-back-office
+          image: yuragranovsky/pulse-values-back-office
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "250m"
+
+          env:
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: mongoPassword
+            - name: CONFIG_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-monitoring-config-map
+                  key: configServerHost
+          ports:
+            - containerPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulse-values-back-office
+spec:
+  selector:
+    app: pulse-values-back-office
+  ports:
+    - port: 9090
+      targetPort: 9090

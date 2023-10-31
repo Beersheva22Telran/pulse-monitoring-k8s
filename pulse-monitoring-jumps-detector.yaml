@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumps-detector
+spec:
+  selector:
+    matchLabels:
+      app: jumps-detector
+  template:
+    metadata:
+      labels:
+        app: jumps-detector
+    spec:
+      containers:
+        - name: jumps-detector
+          image: yuragranovsky/jumps-detector
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "250m"
+
+          env:
+            - name: KARAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: karafkaPassword
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: redisPassword
+            - name: CONFIG_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-monitoring-config-map
+                  key: configServerHost

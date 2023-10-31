@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumps-email-notifier
+spec:
+  selector:
+    matchLabels:
+      app: jumps-email-notifier
+  template:
+    metadata:
+      labels:
+        app: jumps-email-notifier
+    spec:
+      containers:
+        - name: jumps-email-notifier
+          image: yuragranovsky/jumps-email-notifier
+          resources:
+            limits:
+              memory: "300Mi"
+              cpu: "250m"
+
+          env:
+            - name: KARAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: karafkaPassword
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: mailPassword
+            - name: CONFIG_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-monitoring-config-map
+                  key: configServerHost

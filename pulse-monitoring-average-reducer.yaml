@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: average-reducer
+spec:
+  selector:
+    matchLabels:
+      app: average-reducer
+  template:
+    metadata:
+      labels:
+        app: average-reducer
+    spec:
+      containers:
+      - name: average-reducer
+        image: yuragranovsky/average-reducer
+        resources:
+          limits:
+            memory: "300Mi"
+            cpu: "250m"
+         
+        env:
+         - name: KARAFKA_PASSWORD
+           valueFrom:
+            secretKeyRef:
+             name: pulse-monitoring-secret
+             key: karafkaPassword
+         - name: REDIS_PASSWORD
+           valueFrom:
+            secretKeyRef:
+             name: pulse-monitoring-secret
+             key: redisPassword
+         - name: CONFIG_SERVER_HOST
+           valueFrom:
+            configMapKeyRef:
+             name: pulse-monitoring-config-map
+             key: configServerHost                
+        

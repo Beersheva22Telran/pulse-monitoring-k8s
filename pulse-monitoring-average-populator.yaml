@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: average-populator
+spec:
+  selector:
+    matchLabels:
+      app: average-populator
+  template:
+    metadata:
+      labels:
+        app: average-populator
+    spec:
+      containers:
+      - name: average-populator
+        image: yuragranovsky/average-populator
+        resources:
+          limits:
+            memory: "300Mi"
+            cpu: "250m"
+         
+        env:
+         - name: KARAFKA_PASSWORD
+           valueFrom:
+            secretKeyRef:
+             name: pulse-monitoring-secret
+             key: karafkaPassword
+         - name: MONGO_PASSWORD
+           valueFrom:
+            secretKeyRef:
+             name: pulse-monitoring-secret
+             key: mongoPassword
+         - name: CONFIG_SERVER_HOST
+           valueFrom:
+            configMapKeyRef:
+             name: pulse-monitoring-config-map
+             key: configServerHost                
+        
