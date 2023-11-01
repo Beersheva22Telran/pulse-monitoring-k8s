@@ -4,3 +4,4 @@ metadata:
   name: pulse-monitoring-config-map
 data:
   configServerHost: config-server
+  dataProviderHost: email-data-provider

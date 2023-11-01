@@ -1,46 +1,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: email-data-provider
+  name: gateway
 spec:
   selector:
     matchLabels:
-      app: email-data-provider
-  replicas: 2    
+      app: gateway
   template:
     metadata:
       labels:
-        app: email-data-provider
+        app: gateway
     spec:
       containers:
-        - name: email-data-provider
-          image: yuragranovsky/email-data-provider
+        - name: gateway
+          image: yuragranovsky/gateway
           resources:
             limits:
               memory: "300Mi"
               cpu: "250m"
 
           env:
-            - name: POSTGRESQL_PASSWORD
+            - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: pulse-monitoring-secret
-                  key: postgresqlPassword
+                  key: adminPassword
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-monitoring-secret
+                  key: jwtSecret      
             - name: CONFIG_SERVER_HOST
               valueFrom:
                 configMapKeyRef:
                   name: pulse-monitoring-config-map
                   key: configServerHost
           ports:
-            - containerPort: 8080
+            - containerPort: 9292
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: email-data-provider
+  name: gateway
 spec:
   selector:
-    app: email-data-provider
+    app: gateway
+  type: LoadBalancer  
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 9292
+      targetPort: 9292

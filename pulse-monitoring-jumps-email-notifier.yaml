@@ -35,3 +35,8 @@ spec:
                 configMapKeyRef:
                   name: pulse-monitoring-config-map
                   key: configServerHost
+            - name: DATA_PROVIDER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pulse-monitoring-config-map
+                  key: dataProviderHost      
